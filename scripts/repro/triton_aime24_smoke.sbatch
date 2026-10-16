@@ -27,6 +27,7 @@ RUN_ROOT="${PROJECT_ROOT}/run/aime24-triton-smoke-${METHOD}-qwen3-8b-${JOB_ID}"
 SHARED_HF_CACHE="${SHARED_HF_CACHE:-/scratch/shareddata/dldata/huggingface-hub-cache}"
 QWEN3_MODEL_SNAPSHOT="${QWEN3_MODEL_SNAPSHOT:-${SHARED_HF_CACHE}/hub/models--Qwen--Qwen3-8B/snapshots/9c925d64d72725edaf899c6cb9c377fd0709d9c5}"
 MODEL_PATH="${MODEL_PATH:-${QWEN3_MODEL_SNAPSHOT}}"
+RUNTIME_PYTHON_DIR="${RUNTIME_PYTHON_DIR:-${PROJECT_ROOT}/runtime/python}"
 
 case "${METHOD}" in
     grpo) LAGRANGIAN_ENABLE=false ;;
@@ -44,7 +45,7 @@ export MODEL_PATH
 export HF_HOME="${RUN_ROOT}/hf"
 export HF_HUB_CACHE="${SHARED_HF_CACHE}/hub"
 export HF_DATASETS_CACHE="${HF_HOME}/datasets"
-export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
+export PYTHONPATH="${RUNTIME_PYTHON_DIR}:${PROJECT_ROOT}:${PYTHONPATH:-}"
 export PYTHON_BIN="${PYTHON_BIN:-$(command -v python)}"
 export RAY_DATA_HOME="${RUN_ROOT}"
 export HYDRA_RUN_DIR="${RUN_ROOT}/hydra"

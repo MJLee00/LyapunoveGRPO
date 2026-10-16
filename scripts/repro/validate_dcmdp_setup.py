@@ -168,6 +168,8 @@ def check_triton_smoke_script(repo_root: Path) -> None:
         "/scratch/shareddata/dldata/huggingface-hub-cache",
         "QWEN3_MODEL_SNAPSHOT",
         "MODEL_NOT_FOUND",
+        "RUNTIME_PYTHON_DIR",
+        "PYTHONPATH=\"${RUNTIME_PYTHON_DIR}:${PROJECT_ROOT}",
         "module load scicomp-llm-env",
         "examples/CMDP/GRPO_qwen3_8b_lag_v5.sh",
         "DTYPE=bfloat16",

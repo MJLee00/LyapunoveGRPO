@@ -1,0 +1,43 @@
+# sudo docker build . --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg all_proxy=$all_proxy --build-arg no_proxy=$no_proxy -t hub.i.basemind.com/lrz/verl:vllm011.latest -f /mnt/ws-jfs/dsh-jfs/lrz/verl/docker/Dockerfile.stable.vllm_custom
+
+FROM verlai/verl:vllm011.latest
+
+COPY verl/other_scripts/math_verify/ /tmp/math_verify/
+
+RUN pip install --no-cache-dir -U wandb math-verify==0.8.0 && \
+    python3 - <<'PY'
+import importlib.util
+import pathlib
+import shutil
+
+spec = importlib.util.find_spec("math_verify")
+if spec is None or spec.origin is None:
+    raise RuntimeError("math_verify is not installed")
+
+package_dir = pathlib.Path(spec.origin).resolve().parent
+patch_dir = pathlib.Path("/tmp/math_verify")
+
+for filename in ("grader.py", "parser.py", "utils.py"):
+    shutil.copy2(patch_dir / filename, package_dir / filename)
+
+shutil.rmtree(patch_dir)
+print(f"Patched math_verify in {package_dir}")
+PY
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget git vim unzip zip tmux libnuma-dev \
+    && sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/* \
+           /var/cache/apt/archives/* \
+           /root/.cache/pip \
+           /root/.cache/torch \
+           /root/.cache/huggingface \
+           /root/.cache/transformers \
+           /tmp/* \
+           /var/tmp/* \
+           /var/log/*
+
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN printf '\nexport LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}\nexport CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7\n' >> ~/.bashrc

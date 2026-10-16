@@ -1,0 +1,29 @@
+# sudo docker build . --build-arg http_proxy=$http_proxy --build-arg https_proxy=$https_proxy --build-arg all_proxy=$all_proxy --build-arg no_proxy=$no_proxy -t hub.i.basemind.com/lrz/verl:vllm011.latest -f /mnt/ws-jfs/dsh-jfs/lrz/verl/docker/Dockerfile.stable.vllm_custom
+
+FROM verlai/verl:vllm011.latest
+
+RUN python3 -m pip config set global.index-url "http://mirrors.i.basemind.com/pypi/simple/" && \
+    python3 -m pip config set global.extra-index-url "http://pypi.i.basemind.com/brain/dev/+simple https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" && \
+    python3 -m pip config set global.trusted-host "mirrors.i.basemind.com pypi.i.basemind.com"
+
+RUN pip install --no-cache-dir -U wandb math-verify==0.8.0 brainpp
+
+RUN apt-get update
+
+RUN apt-get install -y --no-install-recommends \
+    curl wget git vim unzip zip tmux nvidia-driver-535 libnuma-dev \
+    && sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/* \
+           /var/cache/apt/archives/* \
+           /root/.cache/pip \
+           /root/.cache/torch \
+           /root/.cache/huggingface \
+           /root/.cache/transformers \
+           /tmp/* \
+           /var/tmp/* \
+           /var/log/*
+
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN printf '\nexport LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/cuda/lib64:${LD_LIBRARY_PATH}\nexport CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7\n' >> ~/.bashrc

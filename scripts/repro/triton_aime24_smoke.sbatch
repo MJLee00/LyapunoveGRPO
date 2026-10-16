@@ -56,6 +56,10 @@ export PYTHON_BIN="${PYTHON_BIN:-$(command -v python)}"
 export RAY_DATA_HOME="${RUN_ROOT}"
 export HYDRA_RUN_DIR="${RUN_ROOT}/hydra"
 export WANDB_MODE=offline
+# The cluster runtime's vendored W&B 0.30.0 is missing its optional
+# OpenTelemetry dependencies and scratch quota is full. Console-only logging
+# preserves the training algorithm without requiring credentials or network I/O.
+export DISABLE_WANDB=true
 export EXPERIMENT_NAME="triton_qwen3-8b_dapo2080_aime24_${METHOD}_smoke_v0.7.0dev"
 export TRAIN_FILE="${PROJECT_ROOT}/data/train/dapo_train_qwen3-8b_20_80_6170.parquet"
 export TEST_FILE="['${PROJECT_ROOT}/data/eval/aime24_32.parquet']"

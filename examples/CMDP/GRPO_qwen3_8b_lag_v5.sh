@@ -23,6 +23,9 @@ SAVE_ALL_ROLLOUT_DATA=${SAVE_ALL_ROLLOUT_DATA:-false}
 COMPUTE_PROB_SHIFT=${COMPUTE_PROB_SHIFT:-false}
 SAVE_CKPT=${SAVE_CKPT:-false}
 DATA_TYPE=${DATA_TYPE:-"dapo"}
+# W&B is an optional tracking backend. Keep the upstream console+wandb
+# default, but allow dependency-light cluster smoke gates to use console only.
+DISABLE_WANDB=${DISABLE_WANDB:-false}
 clean=${clean:-0}
 
 # unshared
@@ -175,7 +178,11 @@ else
 fi
 if [ -z "$val_only" ]; then
     val_only=False
-    extra_args+=(trainer.logger=['console','wandb'])
+    if [ "${DISABLE_WANDB}" = "true" ]; then
+        extra_args+=(trainer.logger=['console'])
+    else
+        extra_args+=(trainer.logger=['console','wandb'])
+    fi
     val_before_train=False
 else
     echo "Running validation only: val_ckpt: ${val_ckpt}"
@@ -211,6 +218,7 @@ echo "REPRO_CONFIG repo=${BASE_PATH} model=${MODEL_PATH} data=${TRAIN_FILE} pyth
 echo "REPRO_CONFIG attn_implementation=${ATTN_IMPLEMENTATION}"
 echo "REPRO_CONFIG use_remove_padding=${USE_REMOVE_PADDING}"
 echo "REPRO_CONFIG hydra_run_dir=${HYDRA_RUN_DIR}"
+echo "REPRO_CONFIG tracking_loggers=$([ "${DISABLE_WANDB}" = "true" ] && echo console || echo console,wandb)"
 if [ -n "${WANDB_API_KEY:-}" ]; then
     echo "REPRO_CONFIG wandb_api_key=provided"
 else

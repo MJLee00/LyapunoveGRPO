@@ -13,8 +13,8 @@
 #SBATCH --gres=gpu:gh200:1
 #SBATCH --mem=212G
 #SBATCH --time=36:00:00
-#SBATCH --output=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
-#SBATCH --error=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
+#SBATCH --output=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
+#SBATCH --error=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
 #SBATCH --export=ALL
 
 set -euo pipefail
@@ -41,7 +41,8 @@ case "${METHOD}" in
         ;;
 esac
 
-RUN_ROOT="${PROJECT_ROOT}/run/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}"
+RUNTIME_ROOT="${ENV_ROOT}/runtime"
+RUN_ROOT="${RUNTIME_ROOT}/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}"
 CACHE_ROOT="${RUN_ROOT}/cache"
 RAY_ROOT="${ENV_ROOT}/ray/${SLURM_JOB_ID}"
 mkdir -p "${RUN_ROOT}" "${RAY_ROOT}" \
@@ -69,8 +70,8 @@ COMMON_ENV=(
     --env PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     --env TMPDIR=/envroot/ray/${SLURM_JOB_ID}
     --env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID}
-    --env TORCHINDUCTOR_CACHE_DIR=/workspace/run/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor
-    --env TRITON_CACHE_DIR=/workspace/run/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}/cache/triton
+    --env TORCHINDUCTOR_CACHE_DIR=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor
+    --env TRITON_CACHE_DIR=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}/cache/triton
     --env HF_HOME=/envroot/hf
     --env HF_HUB_CACHE=/envroot/hf/hub
     --env HF_DATASETS_CACHE=/envroot/hf/datasets
@@ -80,7 +81,7 @@ COMMON_ENV=(
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train.parquet
     --env TEST_FILE="['/workspace/verl/data/eval/aime24_32.parquet']"
     --env DATA_TYPE=dapo
-    --env RAY_DATA_HOME=/workspace/run/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}
+    --env RAY_DATA_HOME=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}
     --env EXPERIMENT_NAME=roihu_qwen3-8b_dapo_aime24_${METHOD_TAG}_v0.7.0dev_torch2.8_vllm0.11
     --env PYTHON_BIN=python3
     --env CONDA_HOME=

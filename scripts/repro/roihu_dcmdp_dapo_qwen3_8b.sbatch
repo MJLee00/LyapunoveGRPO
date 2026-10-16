@@ -10,8 +10,8 @@
 #SBATCH --gres=gpu:gh200:1
 #SBATCH --mem=212G
 #SBATCH --time=36:00:00
-#SBATCH --output=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
-#SBATCH --error=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
+#SBATCH --output=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
+#SBATCH --error=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
 #SBATCH --export=ALL
 
 set -euo pipefail
@@ -19,7 +19,8 @@ set -euo pipefail
 PROJECT_ROOT=/scratch/project_2015042/mingyl/LyapunoveGRPO
 ENV_ROOT=/projappl/project_2015042/mingyl/LyapunoveGRPO
 IMAGE=/scratch/project_2015042/renpei/rlsd_runtime/vllm-0.11.0-arm64.sif
-RUN_ROOT="${PROJECT_ROOT}/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}"
+RUNTIME_ROOT="${ENV_ROOT}/runtime"
+RUN_ROOT="${RUNTIME_ROOT}/dcmdp-qwen3-8b-${SLURM_JOB_ID}"
 CACHE_ROOT="${RUN_ROOT}/cache"
 RAY_ROOT="${ENV_ROOT}/ray/${SLURM_JOB_ID}"
 mkdir -p "${RUN_ROOT}" "${RAY_ROOT}" "${CACHE_ROOT}/torchinductor" "${CACHE_ROOT}/triton" "${ENV_ROOT}/hf/hub" "${ENV_ROOT}/hf/datasets"
@@ -49,8 +50,8 @@ apptainer exec --nv \
     --env PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     --env TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
     --env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
-    --env TORCHINDUCTOR_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
-    --env TRITON_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
+    --env TORCHINDUCTOR_CACHE_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
+    --env TRITON_CACHE_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
     --env HF_HOME=/envroot/hf \
     --env HF_HUB_CACHE=/envroot/hf/hub \
     --env HF_DATASETS_CACHE=/envroot/hf/datasets \
@@ -59,7 +60,7 @@ apptainer exec --nv \
     --env MODEL_PATH=Qwen/Qwen3-8B \
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train.parquet \
     --env DATA_TYPE=dapo \
-    --env RAY_DATA_HOME=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
+    --env RAY_DATA_HOME=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
     --env EXPERIMENT_NAME=roihu_qwen3-8b_dapo_dcmdp_v0.7.0dev_torch2.8_vllm0.11 \
     --env PYTHON_BIN=python3 \
     --env CONDA_HOME= \
@@ -102,8 +103,8 @@ apptainer exec --nv \
     --env PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     --env TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
     --env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
-    --env TORCHINDUCTOR_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
-    --env TRITON_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
+    --env TORCHINDUCTOR_CACHE_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
+    --env TRITON_CACHE_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
     --env HF_HOME=/envroot/hf \
     --env HF_HUB_CACHE=/envroot/hf/hub \
     --env HF_DATASETS_CACHE=/envroot/hf/datasets \
@@ -112,7 +113,7 @@ apptainer exec --nv \
     --env MODEL_PATH=Qwen/Qwen3-8B \
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train.parquet \
     --env DATA_TYPE=dapo \
-    --env RAY_DATA_HOME=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
+    --env RAY_DATA_HOME=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
     --env EXPERIMENT_NAME=roihu_qwen3-8b_dapo_dcmdp_v0.7.0dev_torch2.8_vllm0.11 \
     --env PYTHON_BIN=python3 \
     --env CONDA_HOME= \

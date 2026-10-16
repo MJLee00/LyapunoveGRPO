@@ -10,8 +10,8 @@
 #SBATCH --gres=gpu:gh200:1
 #SBATCH --mem=212G
 #SBATCH --time=00:05:00
-#SBATCH --output=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
-#SBATCH --error=/scratch/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
+#SBATCH --output=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out
+#SBATCH --error=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.err
 #SBATCH --export=ALL
 
 set -euo pipefail
@@ -19,7 +19,7 @@ set -euo pipefail
 PROJECT_ROOT=/scratch/project_2015042/mingyl/LyapunoveGRPO
 ENV_ROOT=/projappl/project_2015042/mingyl/LyapunoveGRPO
 IMAGE=/scratch/project_2015042/renpei/rlsd_runtime/vllm-0.11.0-arm64.sif
-RUN_ROOT="${PROJECT_ROOT}/run/smoke/${SLURM_JOB_ID}"
+RUN_ROOT="${ENV_ROOT}/runtime/smoke/${SLURM_JOB_ID}"
 mkdir -p "${RUN_ROOT}"
 exec > >(tee "${RUN_ROOT}/stdout.log") 2> >(tee "${RUN_ROOT}/stderr.log" >&2)
 

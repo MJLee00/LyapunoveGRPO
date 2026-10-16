@@ -100,6 +100,9 @@ def check_aime24_compare_script(repo_root: Path) -> None:
         "OFFLOAD_POLICY=true",
         "RAY_ROOT=\"${ENV_ROOT}/ray/${SLURM_JOB_ID}\"",
         "--env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID}",
+        "RUNTIME_ROOT=\"${ENV_ROOT}/runtime\"",
+        "--output=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out",
+        "--env RAY_DATA_HOME=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}",
         "PPO_MAX_TOKEN_LEN_PER_GPU=4096",
         "AIME24_COMPARE_COMPLETED=1",
     )

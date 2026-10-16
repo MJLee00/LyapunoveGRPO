@@ -65,7 +65,8 @@ apptainer exec --nv \
     --env CONDA_HOME= \
     --env NNODES=1 \
     --env NGPUS_PER_NODE=1 \
-    --env OFFLOAD=True \
+    --env OFFLOAD=false \
+    --env OFFLOAD_POLICY=true \
     --env SAVE_CKPT=true \
     --env WANDB_MODE=offline \
     --env ATTN_IMPLEMENTATION=sdpa \
@@ -117,7 +118,8 @@ apptainer exec --nv \
     --env CONDA_HOME= \
     --env NNODES=1 \
     --env NGPUS_PER_NODE=1 \
-    --env OFFLOAD=True \
+    --env OFFLOAD=false \
+    --env OFFLOAD_POLICY=true \
     --env SAVE_CKPT=true \
     --env WANDB_MODE=offline \
     --env ATTN_IMPLEMENTATION=sdpa \

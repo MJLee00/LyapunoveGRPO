@@ -144,6 +144,7 @@ enforce_eager=${ENFORCE_EAGER:-false}
 total_training_steps=${TOTAL_TRAINING_STEPS:-301}
 test_freq=${TEST_FREQ:-20}
 offload=${OFFLOAD:-False}
+offload_policy=${OFFLOAD_POLICY:-False}
 gen_tp=1
 fsdp_size=-1
 free_cache_engine=True
@@ -246,6 +247,7 @@ fi
     +actor_rollout_ref.actor.optim.override_optimizer_config.eps=1e-15 \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
+    actor_rollout_ref.actor.fsdp_config.offload_policy=${offload_policy} \
     actor_rollout_ref.actor.fsdp_config.dtype=${DTYPE} \
     actor_rollout_ref.ref.strategy=fsdp2 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \

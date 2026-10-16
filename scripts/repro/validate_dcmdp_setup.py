@@ -71,6 +71,8 @@ def check_launcher(repo_root: Path) -> None:
         "MAX_RESPONSE_LENGTH",
         "GPU_MEMORY_UTILIZATION",
         "ENFORCE_EAGER",
+        "OFFLOAD_POLICY",
+        "actor_rollout_ref.actor.fsdp_config.offload_policy=${offload_policy}",
         "TOTAL_TRAINING_STEPS",
         "TEST_FREQ",
         "trainer.total_training_steps=${total_training_steps}",
@@ -95,6 +97,7 @@ def check_aime24_compare_script(repo_root: Path) -> None:
         "MAX_RESPONSE_LENGTH=2048",
         "GPU_MEMORY_UTILIZATION=0.20",
         "ENFORCE_EAGER=true",
+        "OFFLOAD_POLICY=true",
         "PPO_MAX_TOKEN_LEN_PER_GPU=4096",
         "AIME24_COMPARE_COMPLETED=1",
     )

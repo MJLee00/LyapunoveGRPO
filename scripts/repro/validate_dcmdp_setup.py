@@ -135,6 +135,7 @@ def check_paper_8gpu_script(repo_root: Path) -> None:
         "#SBATCH --cpus-per-task=288",
         "#SBATCH --gres=gpu:gh200:4",
         "dapo_train_qwen3-8b_20_80_6170.parquet",
+        "--env DTYPE=bfloat16",
         "--env DATA_TYPE=dapo_2080",
         "--env NNODES=2",
         "--env NGPUS_PER_NODE=4",

@@ -70,6 +70,7 @@ COMMON_ENV=(
     --env BASE_PATH=/workspace/verl
     --env MODEL_BASE_PATH=/envroot/hf/models
     --env MODEL_PATH=Qwen/Qwen3-8B
+    --env DTYPE=bfloat16
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train_qwen3-8b_20_80_6170.parquet
     --env TEST_FILE="['/workspace/verl/data/eval/aime24_32.parquet']"
     --env DATA_TYPE=dapo_2080

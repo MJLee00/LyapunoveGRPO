@@ -90,6 +90,8 @@ COMMON_ENV=(
     --env NGPUS_PER_NODE=1
     --env OFFLOAD=false
     --env OFFLOAD_POLICY=true
+    # Avoid the first dynamic TorchInductor entropy compile on the single-GH200 pilot.
+    --env USE_TORCH_COMPILE=false
     --env SAVE_CKPT=false
     --env WANDB_MODE=offline
     --env ATTN_IMPLEMENTATION=sdpa

@@ -158,6 +158,10 @@ balance_val_batch=True
 val_only="${1:-}"
 val_ckpt="${2:-}"
 extra_args=()
+ray_init_args=()
+if [ -n "${RAY_ADDRESS:-}" ]; then
+    ray_init_args+=("+ray_kwargs.ray_init.address=${RAY_ADDRESS}")
+fi
 if [ $SAVE_ALL_ROLLOUT_DATA = "true" ]; then
     extra_args+=(+trainer.save_all_rollout_data=True)
 fi
@@ -213,6 +217,7 @@ else
     echo "REPRO_CONFIG wandb_api_key=absent"
 fi
 "${PYTHON_BIN}" -m verl.trainer.main_ppo \
+    "${ray_init_args[@]}" \
     hydra.run.dir="${HYDRA_RUN_DIR}" \
     data.train_files="${TRAIN_FILE}" \
     data.seed=42 \

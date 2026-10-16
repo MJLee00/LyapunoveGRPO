@@ -40,6 +40,10 @@ def check_dataset(repo_root: Path) -> None:
     for required in ("data_source", "prompt", "reward_model", "extra_info"):
         assert required in names, (required, sorted(names))
 
+    paper_dataset = repo_root / "data" / "train" / "dapo_train_qwen3-8b_20_80_6170.parquet"
+    assert paper_dataset.is_file(), paper_dataset
+    assert pq.ParquetFile(paper_dataset).metadata.num_rows == 6170
+
 
 def check_algorithm_formula() -> None:
     train_probability = 0.73
@@ -80,6 +84,8 @@ def check_launcher(repo_root: Path) -> None:
         'hydra.run.dir="${HYDRA_RUN_DIR}"',
         "TOTAL_TRAINING_STEPS",
         "TEST_FREQ",
+        "ray_init_args=()",
+        "+ray_kwargs.ray_init.address=${RAY_ADDRESS}",
         "trainer.total_training_steps=${total_training_steps}",
         "trainer.test_freq=${test_freq}",
         "trainer.resume_mode=auto",
@@ -118,6 +124,36 @@ def check_aime24_compare_script(repo_root: Path) -> None:
     assert "project_2008161" in source
     assert "flash_attention_2" not in source
 
+
+def check_paper_8gpu_script(repo_root: Path) -> None:
+    script = repo_root / "scripts" / "repro" / "roihu_aime24_paper_8gpu.sbatch"
+    source = script.read_text(encoding="utf-8")
+    required_fragments = (
+        "#SBATCH --account=project_2008161",
+        "#SBATCH --partition=gpularge",
+        "#SBATCH --nodes=2",
+        "#SBATCH --cpus-per-task=288",
+        "#SBATCH --gres=gpu:gh200:4",
+        "dapo_train_qwen3-8b_20_80_6170.parquet",
+        "--env DATA_TYPE=dapo_2080",
+        "--env NNODES=2",
+        "--env NGPUS_PER_NODE=4",
+        "--env MAX_RESPONSE_LENGTH=8192",
+        "--env TRAIN_PROMPT_BSZ=64",
+        "--env N_RESP_PER_PROMPT=8",
+        "--env TRAIN_PROMPT_MINI_BSZ=16",
+        "--env TOTAL_TRAINING_STEPS=${TOTAL_TRAINING_STEPS}",
+        "--env ATTN_IMPLEMENTATION=sdpa",
+        "--env USE_REMOVE_PADDING=false",
+        "RAY_CLUSTER_READY=1 nodes=2 gpus=8",
+        "AIME24_PAPER_COMPLETED=1",
+        "gpularge/scalability access",
+    )
+    for fragment in required_fragments:
+        assert fragment in source, fragment
+    assert "export HF_TOKEN=" not in source
+    assert "export WANDB_API_KEY=" not in source
+
 def main() -> None:
     repo_root = parse_args().repo_root.resolve()
     check_version(repo_root)
@@ -125,11 +161,13 @@ def main() -> None:
     check_algorithm_formula()
     check_launcher(repo_root)
     check_aime24_compare_script(repo_root)
+    check_paper_8gpu_script(repo_root)
     print("LOCAL_REPRO_CHECK=PASS")
     print(f"verl_version={EXPECTED_VERL_VERSION}")
     print(f"dataset_rows={EXPECTED_ROWS}")
     print("algorithm=DC-GRPO token_prob_diff absneg_0.0_none abs_mean")
     print("attention=sdpa on Roihu ARM64; flash_attention_2 remains the launcher default")
+    print("paper_8gpu_script=PASS; DATA_TYPE=dapo_2080; train_batch=64; rollouts=8; response=8192")
 
 
 if __name__ == "__main__":

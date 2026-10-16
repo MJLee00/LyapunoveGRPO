@@ -102,3 +102,10 @@ The latest local gates still pass (`validate_dcmdp_setup.py`, all reproduction s
 
 - **Fixed, medium severity:** `GRPOLagrangianOperator.apply_to_advantages()` recorded token-level constraint statistics twice: once after flattening the token tensor and again through the normal path. This duplicated observations in buffers larger than one and could bias the dual update toward repeated batches. The redundant call was removed; the paper configuration uses `buffer_size=1`, so the already-completed pilot metric is unchanged.
 - Local verification after the fix passed: `validate_dcmdp_setup.py`, Python compilation of the changed module, `bash -n` for all reproduction launchers, and `git diff --check`. The local environment does not provide `pytest`, so the focused pytest suite remains unexecuted locally and is not claimed as passed.
+
+## Paper-aligned 8-GPU submission design (2026-10-16)
+
+- The README's Qwen3-8B BF16 main configuration uses `DATA_TYPE=dapo_2080`, which resolves to `data/train/dapo_train_qwen3-8b_20_80_6170.parquet`; the earlier pilot used the full 17,398-row parquet and is therefore also data-mismatched relative to the operational README command.
+- Added `scripts/repro/roihu_aime24_paper_8gpu.sbatch` for the documented two-node Roihu allocation (`gpularge`, 4 GH200 GPUs and 288 CPUs per node). It keeps the paper/README knobs: BF16, response length 8192, prompt batch 64, 8 rollouts, PPO mini-batch 16, 301 steps, `c=0.0037`, `lambda_init=0.1`, `lambda_lr=1.0`, `token_prob_diff`, `absneg_0.0_none`, and `abs_mean`.
+- The script starts a two-node Ray cluster and the launcher now accepts `RAY_ADDRESS` through `+ray_kwargs.ray_init.address=...`. Roihu-specific SDPA and `use_remove_padding=false` remain explicitly documented hardware adaptations. The script has not been submitted because gpularge/scalability access and SSH authentication are not currently verifiable.
+- Local validation now additionally checks the 6,170-row README dataset and the 8-GPU script; `validate_dcmdp_setup.py`, Python compilation, `bash -n`, and `git diff --check` pass.

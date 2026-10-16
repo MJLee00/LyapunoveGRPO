@@ -170,7 +170,7 @@ def check_triton_smoke_script(repo_root: Path) -> None:
         "MODEL_NOT_FOUND",
         "RUNTIME_PYTHON_DIR",
         "PYTHONPATH=\"${RUNTIME_PYTHON_DIR}:${PROJECT_ROOT}",
-        "module load scicomp-llm-env",
+        "module load scicomp-llm-env/2025.4",
         "examples/CMDP/GRPO_qwen3_8b_lag_v5.sh",
         "DTYPE=bfloat16",
         "ATTN_IMPLEMENTATION=flash_attention_2",

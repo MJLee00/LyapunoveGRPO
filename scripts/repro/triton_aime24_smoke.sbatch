@@ -38,7 +38,9 @@ esac
 mkdir -p "${PROJECT_ROOT}/logs" "${RUN_ROOT}/hydra" "${RUN_ROOT}/hf"
 exec > >(tee "${RUN_ROOT}/stdout.log") 2> >(tee "${RUN_ROOT}/stderr.log" >&2)
 
-module load scicomp-llm-env
+# Triton's generic module currently resolves to 2026.1 (vLLM 0.19.1); the
+# paper-compatible environment is explicitly pinned to 2025.4 (vLLM 0.11.0).
+module load scicomp-llm-env/2025.4
 export BASE_PATH="${PROJECT_ROOT}"
 export MODEL_BASE_PATH="${PROJECT_ROOT}/models"
 export MODEL_PATH

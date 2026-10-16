@@ -45,6 +45,14 @@
 - Engine: vLLM 0.11.0, PyTorch 2.8.0, Transformers 4.57.3, Ray 2.53.0, `verl==0.7.0.dev` from this fork, math-verify package recorded from the actual environment.
 - No remote submission until local tests pass.
 
+## AIME24 pilot result (Roihu, 2026-10-16)
+
+- The corrected matched pair uses Qwen/Qwen3-8B, the full 17,398-row DAPO-Math-17K training parquet, the 960-row `data/eval/aime24_32.parquet` validation parquet, seed 42, and the same one-GH200 Roihu pilot settings. Only `algorithm.grpo_lagrangian.enable` differs between the methods.
+- DC-GRPO job `2348912` completed with Slurm `ExitCode=0:0`, one visible NVIDIA GH200, `global_step=20`, `AIME24_COMPARE_COMPLETED=1`, and a saved `global_step_20` checkpoint. Final validation metrics were `avg@32=0.2072916667`, `pass@32=0.5`, `std@32=0.0422742164`, `best@32=0.4812333333`, and `maj@32=0.1844`.
+- Vanilla GRPO job `2348913` was released by the dependency and is running; its final metrics are intentionally not recorded until its completion marker and `ExitCode=0:0` are observed.
+- The result is a 20-step, one-GH200 hardware-adapted pilot. It must not be compared as an exact reproduction of the paper's 8-GPU, 8192-response, 301-step training/evaluation schedule until the matched vanilla run completes; the paper's reported scale and the pilot scale are different.
+- The complete DC-GRPO Slurm and runtime logs are preserved locally under `logs/csc/roihu/2348912/`.
+
 ## Roihu environment and resource decision
 - Official current Roihu docs consulted: `gputest` allows up to 15 minutes and one full GH200; `gpumedium` allows one to four full GH200 GPUs up to 36 hours, with 72 CPUs and 212 GiB aggregate allocatable memory per GH200.
 - The user-requested `lumi-minimize-gpu-hours` skill path was checked on `roihu-gpu.csc.fi` and is absent. The submission follows the same objective using a 5-minute one-GH200 smoke test, a one-GH200 full run, no queue polling sleeps, and no more than the needed walltime.

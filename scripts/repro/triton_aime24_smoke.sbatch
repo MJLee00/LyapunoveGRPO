@@ -3,11 +3,11 @@
 # This is deliberately a one-H200, short debug run; it is not a paper result.
 # The paper comparison must use the same launcher with NNODES=1, NGPUS_PER_NODE=8
 # after this gate and after the Triton environment has been verified.
-# Do not submit until `aalto_users` and `gpu-debug` are confirmed for the user.
+# Do not submit until `aalto_users` and the H200 short partition are confirmed.
 # The remote project and log directories must exist before sbatch opens these paths.
 #SBATCH --job-name=aime24-triton-smoke
 #SBATCH --account=aalto_users
-#SBATCH --partition=gpu-debug
+#SBATCH --partition=gpu-h200-141g-short
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16

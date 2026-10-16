@@ -160,7 +160,7 @@ def check_triton_smoke_script(repo_root: Path) -> None:
     script = repo_root / "scripts" / "repro" / "triton_aime24_smoke.sbatch"
     source = script.read_text(encoding="utf-8")
     required_fragments = (
-        "#SBATCH --partition=gpu-debug",
+        "#SBATCH --partition=gpu-h200-141g-short",
         "#SBATCH --gpus=h200:1",
         "#SBATCH --cpus-per-task=16",
         "#SBATCH --mem=96G",

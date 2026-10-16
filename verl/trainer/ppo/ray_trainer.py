@@ -1994,14 +1994,16 @@ class RayPPOTrainer:
                                 metrics.update(compute_mismatch_vs_logits_metrics(batch))
 
                             # Log sequence-level ratio histograms directly to wandb (not through
-                            # shared metrics dict, which gets json-serialized and sent to all loggers)
-                            # Log sequence-level ratio histograms directly to wandb (not through
-                            # shared metrics dict, which gets json-serialized and sent to all loggers)
-                            import wandb
+                            # the shared metrics dict, which gets json-serialized and sent to all
+                            # loggers).  Keep this optional so console-only runs do not require
+                            # the optional wandb/OpenTelemetry dependency.
+                            if "wandb" in self.config.trainer.logger:
+                                import wandb
 
-                            from verl.trainer.ppo.rollout_corr_helper import compute_ratio_histograms
-                            hist_data = compute_ratio_histograms(batch)
-                            wandb.log(hist_data, step=self.global_steps)
+                                from verl.trainer.ppo.rollout_corr_helper import compute_ratio_histograms
+
+                                hist_data = compute_ratio_histograms(batch)
+                                wandb.log(hist_data, step=self.global_steps)
 
                         # compute advantages, executed on the driver process
                         norm_adv_by_std_in_grpo = self.config.algorithm.get(

@@ -24,7 +24,9 @@ PROJECT_ROOT="${PROJECT_ROOT:-/scratch/work/lim7/LyapunoveGRPO}"
 JOB_ID="${SLURM_JOB_ID:-local}"
 METHOD="${METHOD:-dcmdp}"
 RUN_ROOT="${PROJECT_ROOT}/run/aime24-triton-smoke-${METHOD}-qwen3-8b-${JOB_ID}"
-MODEL_PATH="${MODEL_PATH:-Qwen/Qwen3-8B}"
+SHARED_HF_CACHE="${SHARED_HF_CACHE:-/scratch/shareddata/dldata/huggingface-hub-cache}"
+QWEN3_MODEL_SNAPSHOT="${QWEN3_MODEL_SNAPSHOT:-${SHARED_HF_CACHE}/hub/models--Qwen--Qwen3-8B/snapshots/9c925d64d72725edaf899c6cb9c377fd0709d9c5}"
+MODEL_PATH="${MODEL_PATH:-${QWEN3_MODEL_SNAPSHOT}}"
 
 case "${METHOD}" in
     grpo) LAGRANGIAN_ENABLE=false ;;
@@ -40,7 +42,7 @@ export BASE_PATH="${PROJECT_ROOT}"
 export MODEL_BASE_PATH="${PROJECT_ROOT}/models"
 export MODEL_PATH
 export HF_HOME="${RUN_ROOT}/hf"
-export HF_HUB_CACHE="${HF_HOME}/hub"
+export HF_HUB_CACHE="${SHARED_HF_CACHE}/hub"
 export HF_DATASETS_CACHE="${HF_HOME}/datasets"
 export PYTHONPATH="${PROJECT_ROOT}:${PYTHONPATH:-}"
 export PYTHON_BIN="${PYTHON_BIN:-$(command -v python)}"
@@ -84,6 +86,11 @@ export GRPO_LAGRANGIAN_Z=1
 export GRPO_LAGRANGIAN_RATIO=token_prob_diff
 export GRPO_LAGRANGIAN_BUFFER_MODE=abs_mean
 export NORMALIZE_MODE=absneg_0.0_none
+
+if [ ! -f "${MODEL_PATH}/config.json" ]; then
+    echo "MODEL_NOT_FOUND path=${MODEL_PATH}" >&2
+    exit 3
+fi
 
 echo "TRITON_SMOKE_START job=${JOB_ID} method=${METHOD} host=$(hostname)"
 echo "TRITON_SMOKE_CONFIG launcher=examples/CMDP/GRPO_qwen3_8b_lag_v5.sh model=${MODEL_PATH} data=${TRAIN_FILE} eval=${TEST_FILE}"

@@ -46,6 +46,8 @@ The reproduction launcher now takes paths, Python, offload, batch, and secret se
 - Gate `2347681` passed model load and CUDA-graph setup, entered `Training Progress`, and then failed in the first dense-logit entropy calculation. Gate `2347938` passed the rollout/log-prob phase but failed while FSDP initialized the actor optimizer. Gate `2348041` used shorter response and batch limits but still failed at optimizer initialization with only a few MiB free. These failures identify the single-GH200 memory boundary rather than a DC-GRPO code-path error.
 - The current repair uses the same Qwen3-8B and DAPO/AIME24 data but sets the Roihu pilot to `GPU_MEMORY_UTILIZATION=0.20`, `ENFORCE_EAGER=true`, `MAX_RESPONSE_LENGTH=2048`, rollout `n=2`, prompt batch `16`, mini-batch `4`, and 4096-token vLLM/actor scheduling caps. Gate `2348129` was submitted with three real training steps and a 15-minute `gputest` limit to verify that this configuration can remain in training for at least ten minutes. The fixed AIME24 comparison is submitted only after this gate passes.
 - Gate `2348129` reached the first real training step but failed at 2:57 while Adam initialized `exp_avg_sq`; only 19.75 MiB of GPU memory remained. The container's PyTorch documents `CPUOffloadPolicy` as offloading parameters, gradients, and optimizer states, so the next repair enables the existing FSDP2 `actor.fsdp_config.offload_policy=true` path and disables the legacy actor offload flags. No core `verl/` source, framework version, or algorithm was changed.
+- Gate `2348202` validated that repair: it completed two real actor-update steps, ran for 15:21, and kept GPU usage around 23 GiB without an OOM. Slurm then stopped it at the `gputest` wall-time limit before step 3, so it is recorded as `TIMEOUT` rather than a false success. The ten-minute runtime criterion passed, and its logs are preserved under `logs/csc/roihu/2348202/`.
+- With the repaired configuration, matched AIME24 pilot jobs were submitted: DC-GRPO `2348506` and vanilla GRPO `2348507` with `afterok:2348506`. Both use the full DAPO-Math-17K train parquet, only `aime24_32.parquet` for validation, Qwen3-8B, the same pinned framework versions, and 20 training steps; only `GRPO_LAGRANGIAN_ENABLE` differs. At the last status check, both were pending in `gpumedium` by scheduler priority/dependency.
 
 ## Submitted resources
 
@@ -68,6 +70,7 @@ The full job requests account `project_2008161`, partition `gpumedium`, one `gh2
 - `logs/csc/roihu/2347512/`
 - `logs/csc/roihu/2347545/`
 - `logs/csc/roihu/2347546/`
+- `logs/csc/roihu/2348202/`
 
 The requested `lumi-minimize-gpu-hours` skill path was not present on Roihu. Resource selection therefore follows the current CSC Roihu partition documentation and the GPU-training skill's minimum-resource guidance.
 

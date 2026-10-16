@@ -7,11 +7,15 @@
 # The remote project and log directories must exist before sbatch opens these paths.
 #SBATCH --job-name=aime24-triton-smoke
 #SBATCH --account=aalto_users
-#SBATCH --partition=gpu-h200-141g-short
+# ellis is the requested H200 queue; it shares the H200 node pool with short.
+#SBATCH --partition=gpu-h200-141g-ellis
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=96G
+# Qwen3-8B actor initialization follows the official FP32-parameter/BF16-
+# mixed-precision path and peaks above 96G CPU RAM before FSDP is established.
+# Reserve enough CPU memory without changing GPU count or algorithm settings.
+#SBATCH --mem=256G
 #SBATCH --gpus=h200:1
 #SBATCH --time=00:15:00
 #SBATCH --output=/scratch/work/lim7/LyapunoveGRPO/logs/slurm-%x-%j.out

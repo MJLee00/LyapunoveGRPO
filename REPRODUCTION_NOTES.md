@@ -93,6 +93,12 @@
 - After the local shell/Python/reproduction checks passed, the updated launcher was synchronized to the existing scratch source file and its hash matched locally. New comparison scripts were stored under `/projappl` so no scratch inode was needed. Corrected pair: DC-GRPO `2348912`; vanilla GRPO `2348913` with `afterok:2348912`. Both were pending at submission, with no failure recorded.
 - Runtime diagnosis for `2348912`: after about eight minutes the actor worker and TorchInductor compile workers were CPU-bound while the GH200 stayed at 0% utilization with roughly 23 GiB allocated; no OOM or traceback was present. The Roihu comparison adapter now sets `USE_TORCH_COMPILE=false` to avoid the first dynamic entropy compile on this ARM64 single-GH200 pilot. The launcher default remains enabled, so supported hosts retain upstream behavior. Local reproduction and shell checks pass after this change; a new job will only be submitted after the current authoritative pair reaches a terminal state.
 
+## Triton formal queue recheck (2026-10-16)
+
+- Formal DC-GRPO job `21001945` remains the sole Triton paper-scale reproduction job; it is still `PENDING`, has no run files or failure record, and has not been cancelled or duplicated. Its requested allocation is one H200 node with 8 H200 GPUs, 128 CPUs, 1024G, and an 8-hour limit.
+- A fresh scheduler dry run estimated the same configuration at `2026-10-18T11:24:36` on `gpu58` in `gpu-h200-141g-ellis`, versus the existing `gpu-h200-141g-m` estimate of `2026-10-19T01:35:22`. The pending job was therefore moved in place to `gpu-h200-141g-ellis`; this preserves its unique run directory and does not create a second training job. The short partition dry run was later than both estimates and was not used.
+- After the partition update, Slurm reports `PENDING (Priority)` with the job's start estimate still being recomputed. Vanilla GRPO remains intentionally unsubmitted until DC-GRPO reaches a terminal state with `ExitCode=0:0`, an 8-GPU visibility check, a completion marker, and an AIME24 validation result.
+
 ## Paper-aligned follow-up configuration
 
 - The operational Qwen3-8B BF16 README command uses `DATA_TYPE=dapo_2080`, which resolves to the 6,170-row `data/train/dapo_train_qwen3-8b_20_80_6170.parquet`; the earlier 17,398-row pilot is therefore not README-equivalent either.

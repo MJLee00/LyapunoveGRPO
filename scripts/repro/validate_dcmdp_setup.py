@@ -189,6 +189,44 @@ def check_triton_smoke_script(repo_root: Path) -> None:
     assert "export HF_TOKEN=" not in source
     assert "export WANDB_API_KEY=" not in source
 
+
+def check_triton_paper_script(repo_root: Path) -> None:
+    script = repo_root / "scripts" / "repro" / "triton_aime24_paper_8gpu.sbatch"
+    source = script.read_text(encoding="utf-8")
+    required_fragments = (
+        "#SBATCH --account=aalto_users",
+        "#SBATCH --partition=gpu-h200-141g-ellis",
+        "#SBATCH --nodes=1",
+        "#SBATCH --cpus-per-task=128",
+        "#SBATCH --gpus=h200:8",
+        "#SBATCH --mem=1024G",
+        "/scratch/shareddata/dldata/huggingface-hub-cache",
+        "module load scicomp-llm-env/2025.4",
+        "DATA_TYPE=dapo_2080",
+        "dapo_train_qwen3-8b_20_80_6170.parquet",
+        "aime24_32.parquet",
+        "DTYPE=bfloat16",
+        "ATTN_IMPLEMENTATION=flash_attention_2",
+        "USE_REMOVE_PADDING=true",
+        "NNODES=1",
+        "NGPUS_PER_NODE=8",
+        "MAX_RESPONSE_LENGTH=8192",
+        "TRAIN_PROMPT_BSZ=64",
+        "N_RESP_PER_PROMPT=8",
+        "TRAIN_PROMPT_MINI_BSZ=16",
+        "TOTAL_TRAINING_STEPS=\"${TOTAL_TRAINING_STEPS:-301}\"",
+        "GRPO_LAGRANGIAN_ENABLE=\"${LAGRANGIAN_ENABLE}\"",
+        "AIME24_TRITON_PAPER_COMPLETED=1",
+        "VERSION_MISMATCH",
+        "FLASH_ATTN_IMPORT_FAILED",
+    )
+    for fragment in required_fragments:
+        assert fragment in source, fragment
+    assert "project_2015042" not in source
+    assert "vllm-0.11.0-arm64.sif" not in source
+    assert "export HF_TOKEN=" not in source
+    assert "export WANDB_API_KEY=" not in source
+
 def main() -> None:
     repo_root = parse_args().repo_root.resolve()
     check_version(repo_root)
@@ -198,12 +236,13 @@ def main() -> None:
     check_aime24_compare_script(repo_root)
     check_paper_8gpu_script(repo_root)
     check_triton_smoke_script(repo_root)
+    check_triton_paper_script(repo_root)
     print("LOCAL_REPRO_CHECK=PASS")
     print(f"verl_version={EXPECTED_VERL_VERSION}")
     print(f"dataset_rows={EXPECTED_ROWS}")
     print("algorithm=DC-GRPO token_prob_diff absneg_0.0_none abs_mean")
     print("attention=sdpa on Roihu ARM64; flash_attention_2 remains the launcher default")
-    print("paper_8gpu_script=PASS; DATA_TYPE=dapo_2080; train_batch=64; rollouts=8; response=8192")
+    print("paper_8gpu_scripts=PASS; DATA_TYPE=dapo_2080; train_batch=64; rollouts=8; response=8192")
 
 
 if __name__ == "__main__":

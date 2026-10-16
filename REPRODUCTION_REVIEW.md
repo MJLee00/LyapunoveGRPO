@@ -97,3 +97,8 @@ The current corrected pair is not a paper-equivalent result. Jobs `2348912` and 
 The current CSC Roihu documentation confirms that eight GPUs require two four-GH200 nodes in `gpularge`, and that `gpularge` access requires a scalability test. The next exact-alignment submission must first verify that access and implement a multi-node Ray launch; it must not silently reuse the one-GH200 pilot script. Until then, only a clearly labelled hardware-adapted gate may be submitted.
 
 The latest local gates still pass (`validate_dcmdp_setup.py`, all reproduction shell scripts with `bash -n`, and `git diff --check`). No new job was submitted during this audit because `roihu-gpu.csc.fi` currently rejects the connection (`Connection refused`), while `roihu-cpu.csc.fi` still rejects the available SSH certificate. Existing jobs and outputs were not cancelled or modified.
+
+## Claude Scholar code-review follow-up (2026-10-16)
+
+- **Fixed, medium severity:** `GRPOLagrangianOperator.apply_to_advantages()` recorded token-level constraint statistics twice: once after flattening the token tensor and again through the normal path. This duplicated observations in buffers larger than one and could bias the dual update toward repeated batches. The redundant call was removed; the paper configuration uses `buffer_size=1`, so the already-completed pilot metric is unchanged.
+- Local verification after the fix passed: `validate_dcmdp_setup.py`, Python compilation of the changed module, `bash -n` for all reproduction launchers, and `git diff --check`. The local environment does not provide `pytest`, so the focused pytest suite remains unexecuted locally and is not claimed as passed.

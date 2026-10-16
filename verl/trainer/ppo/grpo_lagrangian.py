@@ -641,8 +641,6 @@ class GRPOLagrangianOperator:
             raw_penalty = torch.where(same_sign, raw_penalty, torch.zeros_like(raw_penalty))
             normalize_mode = "none"
 
-        if penalty_level == "token":
-            self.record_batch_constraint_stats(raw_penalty.flatten(), penalty_mask=penalty_mask.flatten())
         self.record_batch_constraint_stats(raw_penalty, penalty_mask=penalty_mask)
         penalty_advantages = torch.zeros_like(advantages)
         selected_penalty = raw_penalty if penalty_mask is None else raw_penalty[penalty_mask]

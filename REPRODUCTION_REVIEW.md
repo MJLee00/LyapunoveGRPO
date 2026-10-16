@@ -110,3 +110,9 @@ The latest local gates still pass (`validate_dcmdp_setup.py`, all reproduction s
 - The script starts a two-node Ray cluster and the launcher now accepts `RAY_ADDRESS` through `+ray_kwargs.ray_init.address=...`. Roihu-specific SDPA and `use_remove_padding=false` remain explicitly documented hardware adaptations. The script has not been submitted because gpularge/scalability access and SSH authentication are not currently verifiable.
 - Local validation now additionally checks the 6,170-row README dataset and the 8-GPU script; `validate_dcmdp_setup.py`, Python compilation, `bash -n`, and `git diff --check` pass.
 - Follow-up configuration review found that the paper script relied on the launcher's implicit BF16 default. The script now passes `DTYPE=bfloat16` explicitly, and the local validator asserts this setting so an environment override cannot silently change the Table 1 regime.
+
+## Official CMDP entrypoint and Triton portability audit (2026-10-16)
+
+- The authoritative training entrypoint is `examples/CMDP/GRPO_qwen3_8b_lag_v5.sh`. Its default `NNODES=1` and `NGPUS_PER_NODE=8` match a single Triton H200 node for the paper's eight-GPU Qwen3-8B run; the launcher passes the training, rollout, optimizer, validation, and DC-GRPO arguments into `verl.trainer.main_ppo`.
+- `scripts/repro/roihu_aime24_paper_8gpu.sbatch` is not a Triton submission script. It binds Roihu `/scratch/project_2015042` and `/projappl/project_2015042` paths, uses a Roihu ARM64 Apptainer image, and applies the Roihu SDPA/remove-padding adaptation. It must not be submitted on Triton.
+- A Triton wrapper must be finalized only after login-time checks identify the available Python/vLLM environment, model-cache location, dataset path, Slurm account, and H200 partition. Until those checks are available, the existing Roihu wrapper is deliberately left untouched and no Triton job is submitted.

@@ -73,6 +73,8 @@ def check_launcher(repo_root: Path) -> None:
         "ENFORCE_EAGER",
         "OFFLOAD_POLICY",
         "actor_rollout_ref.actor.fsdp_config.offload_policy=${offload_policy}",
+        'export HYDRA_RUN_DIR="${HYDRA_RUN_DIR:-${BASE_PATH}/outputs}"',
+        'hydra.run.dir="${HYDRA_RUN_DIR}"',
         "TOTAL_TRAINING_STEPS",
         "TEST_FREQ",
         "trainer.total_training_steps=${total_training_steps}",
@@ -103,6 +105,7 @@ def check_aime24_compare_script(repo_root: Path) -> None:
         "RUNTIME_ROOT=\"${ENV_ROOT}/runtime\"",
         "--output=/projappl/project_2015042/mingyl/LyapunoveGRPO/logs/slurm-%x-%j.out",
         "--env RAY_DATA_HOME=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}",
+        "--env HYDRA_RUN_DIR=/envroot/runtime/aime24-${METHOD_TAG}-qwen3-8b-${SLURM_JOB_ID}/hydra",
         "PPO_MAX_TOKEN_LEN_PER_GPU=4096",
         "AIME24_COMPARE_COMPLETED=1",
     )

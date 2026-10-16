@@ -56,6 +56,7 @@ REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd)"
 export BASE_PATH="${BASE_PATH:-${REPO_ROOT}}"
 export MODEL_BASE_PATH="${MODEL_BASE_PATH:-${BASE_PATH}/models}"
 export MODEL_PATH="${MODEL_PATH:-${MODEL_BASE_PATH}/Qwen3-8B}"
+export HYDRA_RUN_DIR="${HYDRA_RUN_DIR:-${BASE_PATH}/outputs}"
 
 if [ "${DATA_TYPE}" = "dapo_2080" ]; then
     EXPERIMENT_NAME="${EXPERIMENT_NAME}_2080"
@@ -204,12 +205,14 @@ mkdir -p "${WANDB_DIR_CUSTOM}"
 echo "REPRO_CONFIG repo=${BASE_PATH} model=${MODEL_PATH} data=${TRAIN_FILE} python=${PYTHON_BIN} wandb_mode=${WANDB_MODE}"
 echo "REPRO_CONFIG attn_implementation=${ATTN_IMPLEMENTATION}"
 echo "REPRO_CONFIG use_remove_padding=${USE_REMOVE_PADDING}"
+echo "REPRO_CONFIG hydra_run_dir=${HYDRA_RUN_DIR}"
 if [ -n "${WANDB_API_KEY:-}" ]; then
     echo "REPRO_CONFIG wandb_api_key=provided"
 else
     echo "REPRO_CONFIG wandb_api_key=absent"
 fi
 "${PYTHON_BIN}" -m verl.trainer.main_ppo \
+    hydra.run.dir="${HYDRA_RUN_DIR}" \
     data.train_files="${TRAIN_FILE}" \
     data.seed=42 \
     data.val_files="${TEST_FILE}" \

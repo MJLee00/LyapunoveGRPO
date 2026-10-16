@@ -61,6 +61,7 @@ apptainer exec --nv \
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train.parquet \
     --env DATA_TYPE=dapo \
     --env RAY_DATA_HOME=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
+    --env HYDRA_RUN_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/hydra \
     --env EXPERIMENT_NAME=roihu_qwen3-8b_dapo_dcmdp_v0.7.0dev_torch2.8_vllm0.11 \
     --env PYTHON_BIN=python3 \
     --env CONDA_HOME= \
@@ -114,6 +115,7 @@ apptainer exec --nv \
     --env TRAIN_FILE=/workspace/verl/data/train/dapo_train.parquet \
     --env DATA_TYPE=dapo \
     --env RAY_DATA_HOME=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID} \
+    --env HYDRA_RUN_DIR=/envroot/runtime/dcmdp-qwen3-8b-${SLURM_JOB_ID}/hydra \
     --env EXPERIMENT_NAME=roihu_qwen3-8b_dapo_dcmdp_v0.7.0dev_torch2.8_vllm0.11 \
     --env PYTHON_BIN=python3 \
     --env CONDA_HOME= \

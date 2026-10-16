@@ -98,6 +98,8 @@ def check_aime24_compare_script(repo_root: Path) -> None:
         "GPU_MEMORY_UTILIZATION=0.20",
         "ENFORCE_EAGER=true",
         "OFFLOAD_POLICY=true",
+        "RAY_ROOT=\"${ENV_ROOT}/ray/${SLURM_JOB_ID}\"",
+        "--env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID}",
         "PPO_MAX_TOKEN_LEN_PER_GPU=4096",
         "AIME24_COMPARE_COMPLETED=1",
     )

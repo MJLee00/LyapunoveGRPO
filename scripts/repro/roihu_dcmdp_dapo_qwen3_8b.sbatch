@@ -21,7 +21,7 @@ ENV_ROOT=/projappl/project_2015042/mingyl/LyapunoveGRPO
 IMAGE=/scratch/project_2015042/renpei/rlsd_runtime/vllm-0.11.0-arm64.sif
 RUN_ROOT="${PROJECT_ROOT}/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}"
 CACHE_ROOT="${RUN_ROOT}/cache"
-RAY_ROOT="${PROJECT_ROOT}/r/${SLURM_JOB_ID}"
+RAY_ROOT="${ENV_ROOT}/ray/${SLURM_JOB_ID}"
 mkdir -p "${RUN_ROOT}" "${RAY_ROOT}" "${CACHE_ROOT}/torchinductor" "${CACHE_ROOT}/triton" "${ENV_ROOT}/hf/hub" "${ENV_ROOT}/hf/datasets"
 exec > >(tee "${RUN_ROOT}/stdout.log") 2> >(tee "${RUN_ROOT}/stderr.log" >&2)
 
@@ -47,8 +47,8 @@ apptainer exec --nv \
     --env GCC=/usr/bin/gcc \
     --env CUDAHOSTCXX=/usr/bin/g++ \
     --env PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-    --env TMPDIR=/workspace/r/${SLURM_JOB_ID} \
-    --env RAY_TMPDIR=/workspace/r/${SLURM_JOB_ID} \
+    --env TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
+    --env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
     --env TORCHINDUCTOR_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
     --env TRITON_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
     --env HF_HOME=/envroot/hf \
@@ -100,8 +100,8 @@ apptainer exec --nv \
     --env GCC=/usr/bin/gcc \
     --env CUDAHOSTCXX=/usr/bin/g++ \
     --env PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-    --env TMPDIR=/workspace/r/${SLURM_JOB_ID} \
-    --env RAY_TMPDIR=/workspace/r/${SLURM_JOB_ID} \
+    --env TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
+    --env RAY_TMPDIR=/envroot/ray/${SLURM_JOB_ID} \
     --env TORCHINDUCTOR_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/torchinductor \
     --env TRITON_CACHE_DIR=/workspace/run/dcmdp-qwen3-8b-${SLURM_JOB_ID}/cache/triton \
     --env HF_HOME=/envroot/hf \

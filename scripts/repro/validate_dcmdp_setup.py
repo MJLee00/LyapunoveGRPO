@@ -155,6 +155,32 @@ def check_paper_8gpu_script(repo_root: Path) -> None:
     assert "export HF_TOKEN=" not in source
     assert "export WANDB_API_KEY=" not in source
 
+
+def check_triton_smoke_script(repo_root: Path) -> None:
+    script = repo_root / "scripts" / "repro" / "triton_aime24_smoke.sbatch"
+    source = script.read_text(encoding="utf-8")
+    required_fragments = (
+        "#SBATCH --partition=gpu-debug",
+        "#SBATCH --gpus=h200:1",
+        "#SBATCH --cpus-per-task=16",
+        "#SBATCH --mem=96G",
+        "#SBATCH --time=00:15:00",
+        "module load scicomp-llm-env",
+        "examples/CMDP/GRPO_qwen3_8b_lag_v5.sh",
+        "DTYPE=bfloat16",
+        "ATTN_IMPLEMENTATION=flash_attention_2",
+        "USE_REMOVE_PADDING=true",
+        "TRITON_SMOKE_COMPLETED=1",
+        "VERSION_MISMATCH",
+        "FLASH_ATTN_IMPORT_FAILED",
+    )
+    for fragment in required_fragments:
+        assert fragment in source, fragment
+    assert "project_2015042" not in source
+    assert "vllm-0.11.0-arm64.sif" not in source
+    assert "export HF_TOKEN=" not in source
+    assert "export WANDB_API_KEY=" not in source
+
 def main() -> None:
     repo_root = parse_args().repo_root.resolve()
     check_version(repo_root)
@@ -163,6 +189,7 @@ def main() -> None:
     check_launcher(repo_root)
     check_aime24_compare_script(repo_root)
     check_paper_8gpu_script(repo_root)
+    check_triton_smoke_script(repo_root)
     print("LOCAL_REPRO_CHECK=PASS")
     print(f"verl_version={EXPECTED_VERL_VERSION}")
     print(f"dataset_rows={EXPECTED_ROWS}")
